@@ -124,6 +124,36 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
   Pierwszy z nich renderuje informacje o przegranej użytkownika, drugi zaś o wygranej.
   Moduł przyjmuje informacje o pozycji myszki, dzięki czemu jest w stanie wygenerować symbol myszy w odpowiednim miejscu.
 
+ \item
+  lcg - Moduł odpowiedzialny za generowanie liczb pseudolosowych.
+  Wewnętrznie używa implementacji algorytmu LCG (Linear congruential generator).
+  Parametry algorytmu zostały dobrane eksperymentalnie, bazując na rozwiązaniach w bibliotece glibc (standardowa biblioteka C, GNU).
+  Dodatkowo dobrane parametry zostały zasymulowane w języku Python, aby potwierdzić równomierny rozkład losowanych liczb.
+
+ \item
+  object\_generator - Moduł odpowiedzialny za wygenerowanie kolejnych obiektów wyświetlanych na ekranie w losowych miejscach.
+  Wewnetrzna implementacja korzysta z zmodyfikowanego algorytmu "Fisher–Yates shuffle".
+  Aby powierdzić równomierny rozkład podczas operacji mieszania, zmodyfikowany algorytm został w pierwszej kolejności zaimplementowany w języku Python.
+  Modyfikacja polega na poszerzeniu zakresu losowania elementów, które zamieniane są miejscami.
+  Dzięki temu dzielenie przy obliczaniu reszty z dzielenia, wykorzystuje dzielenie przez stałą, przez to nie jest wymagany układ dzielący.
+  object\_generator operuje na pamięci ram w celu wygenerowania losowego położenia obiektów.
+  Parametr wielkości miejsc pustych nie może być zmieniony dynamicznie (w trakcie działania układu), natomiast jest łatwo modyfikowalny w kodzie.
+  Wymaga to jednak ponownej syntezy.
+  Parametr ilości generowanych obeiktów zajmujących nie puste pola jest natomiast całkowicie konfigurowalny w czasie działania układu.
+
+ \item
+   ram16 - prosty moduł implementujący pamięć RAM z 16-bitową szyną adresową dla 8-bitowych komórek danych.
+
+ \item
+   memmux - prosty moduł implementujący multiplexer dostępu do modułu ram16.
+
+ \item
+  logic - główny moduł spajający i zarządzający.
+  Implementuje główną logikę gry, oraz zarządzanie jej stanem.
+  Steruje restartowaniem oraz inicjalizacją gry, przełącza moduł vga\_driver w odpowiedni tryb wyświetlania, obsługuje zdarzenia generowane przez moduł 
+  PS2\_Controler, oraz zarządznie dostępem do współdzielonej magistarali do pamięci RAM za pomocą multiplexera memmux.
+
+
 \end{itemize}
 
 \subsubsection{Zewnętrzne moduły}
