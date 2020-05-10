@@ -128,15 +128,16 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
   lcg - Moduł odpowiedzialny za generowanie liczb pseudolosowych.
   Wewnętrznie używa implementacji algorytmu LCG (Linear congruential generator).
   Parametry algorytmu zostały dobrane eksperymentalnie, bazując na rozwiązaniach w bibliotece glibc (standardowa biblioteka C, GNU).
-  Dodatkowo dobrane parametry zostały zasymulowane w języku Python, aby potwierdzić równomierny rozkład losowanych liczb.
+  Dobrane parametry zostały zasymulowane w języku Python, aby potwierdzić równomierny rozkład losowanych liczb.
 
  \item
   object\_generator - Moduł odpowiedzialny za wygenerowanie kolejnych obiektów wyświetlanych na ekranie w losowych miejscach.
-  Wewnetrzna implementacja korzysta z zmodyfikowanego algorytmu "Fisher–Yates shuffle".
+  Wewnetrzna implementacja korzysta ze zmodyfikowanego algorytmu "Fisher–Yates shuffle".
   Aby powierdzić równomierny rozkład podczas operacji mieszania, zmodyfikowany algorytm został w pierwszej kolejności zaimplementowany w języku Python.
-  Modyfikacja polega na poszerzeniu zakresu losowania elementów, które zamieniane są miejscami.
-  Dzięki temu dzielenie przy obliczaniu reszty z dzielenia, wykorzystuje dzielenie przez stałą, przez to nie jest wymagany układ dzielący.
-  object\_generator operuje na pamięci ram w celu wygenerowania losowego położenia obiektów.
+  Modyfikacja polega na poszerzeniu zakresu losowania elementów, które zamieniane są miejscami, na stałą z góry zadaną wartość.
+  Pozwala to na całkowite pozbycie się modułu dzielącego.
+  Dzielenie przez stałą zostaje wyoptymalizowane jako mnożenie i dodawanie.
+  object\_generator operuje na pamięci ram w celu umiejscowenia liczb w losowo wybranych miejscach.
   Parametr wielkości miejsc pustych nie może być zmieniony dynamicznie (w trakcie działania układu), natomiast jest łatwo modyfikowalny w kodzie.
   Wymaga to jednak ponownej syntezy.
   Parametr ilości generowanych obeiktów zajmujących nie puste pola jest natomiast całkowicie konfigurowalny w czasie działania układu.
