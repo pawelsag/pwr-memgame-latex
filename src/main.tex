@@ -69,7 +69,10 @@
 \tableofcontents
 \newpage
 \section{Wstęp}
-Układ FPGA czyli bezpośrednio programowalna macierz bramek logicznych, umożliwia wielokrotne programowanie połączeń cyfrowych układów logicznych. Celem projektu było zaprojektowanie oraz wykonanie programu dedykowanego pod układ FPGA, a następnie jego przetestowanie. Wybrany przez nas temat to gra pamięciowa, w której to użytkownikowi musi zapamiętać losowo umiejscowione liczby, a następnie kliknąć na nie w odpowiedniej kolejności. Projekt dedykowany jest pod urządzenie z układem Xilinx Spartan-3E.
+Układ FPGA czyli bezpośrednio programowalna macierz bramek logicznych, umożliwia wielokrotne programowanie połączeń cyfrowych układów logicznych.
+Celem projektu było zaprojektowanie oraz wykonanie programu dedykowanego pod układ FPGA, a następnie jego przetestowanie.
+Wybrany przez nas temat to gra pamięciowa, w której to użytkownikowi musi zapamiętać losowo umiejscowione liczby, a następnie kliknąć na nie w odpowiedniej kolejności.
+Projekt dedykowany jest pod urządzenie z układem Xilinx Spartan-3E.
 
 \section{Założenia projektowe}
 Poniżej lista zawierająca przedstawione założenia projektowe:
@@ -85,28 +88,76 @@ Poniżej lista zawierająca przedstawione założenia projektowe:
 \end{itemize}
 
 \section{Opis projektu}
-Program składa się z modułów wykonywanych w języku VHDL, które następnie połączone zostały za pomocą głównego schematu projektu. Oprócz modułów wykonanych na potrzebę tego programu, użyte zostały komponenty dostarczone przez dr. Sugiera konkretnie PS2\_MOUSE oraz VGAtxt48x20.Ze względu na ograniczony dostęp do sprzętu, dla każdego komponentu utworzony został test, który potwierdza jego poprawną implementacje. Dodatkowo aby zminimalizować ilość błędów, komponenty zostały pogrupowane w zbiory zawierające najmniejsza możliwą ilość modułów stanowiącą logiczną całość. Dzięki takiemu podejściu analiza błędów syntezy jest mniej złożona. Projekt dedykowany jest pod zestaw Digilent S3E-Starter, który to posiada wyprowadzone złącze PS2 oraz konektor VGA.
+Program składa się z modułów wykonywanych w języku VHDL, które następnie połączone zostały za pomocą głównego schematu projektu.
+Oprócz modułów wykonanych na potrzebę tego programu, użyte zostały komponenty dostarczone przez dr.
+Sugiera konkretnie PS2\_MOUSE oraz VGAtxt48x20.Ze względu na ograniczony dostęp do sprzętu, dla każdego komponentu utworzony został test, który potwierdza jego poprawną implementacje.
+Dodatkowo aby zminimalizować ilość błędów, komponenty zostały pogrupowane w zbiory zawierające najmniejsza możliwą ilość modułów stanowiącą logiczną całość.
+Dzięki takiemu podejściu analiza błędów syntezy jest mniej złożona.
+Projekt dedykowany jest pod zestaw Digilent S3E-Starter, który to posiada wyprowadzone złącze PS2 oraz konektor VGA.
 \newline
-Głównym komponentem programu jest moduł logic który spaja ze sobą wszystkie stworzone moduły. W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz relacji pomiędzy nimi. 
+Głównym komponentem programu jest moduł logic który spaja ze sobą wszystkie stworzone moduły.
+W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz relacji pomiędzy nimi. 
 \newpage
 \subsection{Wykorzystane moduły}
 \subsubsection{Stworzone moduły}
 \begin{itemize}
- \item Licznik - Prosty 16-bitowy moduł zliczający cykle zegara oraz podający informacje o aktualnym stanie licznika na magistrale.
- \item PS2\_Controler - Moduł służy do wyliczania aktualnej pozycji myszki. Wyliczone dane ograniczone są przez minimalną oraz maksymalną rozdzielczość ekranu. Oznacza to, że moduł nigdy nie zwróci ujemnej pozycji oraz pozycji większej niż założona. Układ propaguje również informacje o kliknięciu przez użytkownika lewego przycisku myszy. Informacja widnieje na linii tak długo, aż inny moduł nie poprosi o jej wyczyszczenie. Wystawione dane pozycji myszki w momencie kliknięcia, pozostają niezmienione, aż do momentu ustawienia linii na stan niski. 
- \item vga\_driver - Prosty układ potrafiący przekazywać dane od logiki programu na wejście sterownika VGAtxt48x20. Układ posiada 4 tryby. Pierwszy tryb umożliwia renderowanie pamięci bez ukrywania jej zawartości. Oznacza to, że wszystkie wygenerowane liczby renderowane są jako ich odpowiadająca znakowa reprezentacja. Kolejny tryb umożliwia renderowanie ukryte. Oznacza to, że wszystkie liczby w pamięci wyświetlane są jako czarne kafelki. Dwa ostanie tryby umożliwiają wyświetlenie informacji o stanie gry użytkownika. Pierwszy z nich renderuje informacje o przegranej użytkownika, drugi zaś o wygranej. Moduł przyjmuje informacje o pozycji myszki, dzięki czemu jest w stanie wygenerować symbol myszy w odpowiednim miejscu.     
+ \item
+  Licznik - Prosty 16-bitowy moduł zliczający cykle zegara oraz podający informacje o aktualnym stanie licznika na magistrale.
+
+ \item
+  PS2\_Controler - Moduł służy do wyliczania aktualnej pozycji myszki.
+  Wyliczone dane ograniczone są przez minimalną oraz maksymalną rozdzielczość ekranu.
+  Oznacza to, że moduł nigdy nie zwróci ujemnej pozycji oraz pozycji większej niż założona.
+  Układ propaguje również informacje o kliknięciu przez użytkownika lewego przycisku myszy.
+  Informacja widnieje na linii tak długo, aż inny moduł nie poprosi o jej wyczyszczenie.
+  Wystawione dane pozycji myszki w momencie kliknięcia, pozostają niezmienione, aż do momentu ustawienia linii na stan niski. 
+
+ \item
+  vga\_driver - Prosty układ potrafiący przekazywać dane od logiki programu na wejście sterownika VGAtxt48x20.
+  Układ posiada 4 tryby.
+  Pierwszy tryb umożliwia renderowanie pamięci bez ukrywania jej zawartości.
+  Oznacza to, że wszystkie wygenerowane liczby renderowane są jako ich odpowiadająca znakowa reprezentacja.
+  Kolejny tryb umożliwia renderowanie ukryte.
+  Oznacza to, że wszystkie liczby w pamięci wyświetlane są jako czarne kafelki.
+  Dwa ostanie tryby umożliwiają wyświetlenie informacji o stanie gry użytkownika.
+  Pierwszy z nich renderuje informacje o przegranej użytkownika, drugi zaś o wygranej.
+  Moduł przyjmuje informacje o pozycji myszki, dzięki czemu jest w stanie wygenerować symbol myszy w odpowiednim miejscu.     
+
 \end{itemize}
 
 \subsubsection{Zewnętrzne moduły}
 \begin{itemize}
- \item Moduł PS2\_Mouse - Moduł ten przekazuje dane dostarczone przez aktualnie podłączoną myszkę. Kiedy dane są aktywne układ ustawia jedno cyklowy stan wysoki na linii. Oprócz tego dostarcza informacje o przesunięciu myszki względem ostatniej pozycji w osi X oraz Y. Oprócz tego moduł przekazuje informacje na temat zwrotu myszki w poszczególnych kierunkach oraz informacje na temat wciśniętych przycisków. Oś X, Y oraz status są 8 bitowymi magistralami.
- \item Moduł VGAtxt48x20 - moduł wyświetla przekazane dane na ekranie monitora. Dane podawane są na 8 bitową magistrale. Moduł wyświetla znaki zakodowane według standardowej tablic ASCII, wyjątkiem są wartości z przedziału 0x0 - 0x1F. Informacje na temat wspominanego zakresu można znaleźć w dokumentacji modułu. Po wyświetleniu zadanego znaku, moduł automatycznie zwiększa pozycję na której wystąpi wyświetlenie kolejnego znaku. Możliwy jest również powrót kursora do początku linii lub początku ekranu.
- \end{itemize}
+ \item
+  Moduł PS2\_Mouse - Moduł ten przekazuje dane dostarczone przez aktualnie podłączoną myszkę.
+  Kiedy dane są aktywne układ ustawia jedno cyklowy stan wysoki na linii.
+  Oprócz tego dostarcza informacje o przesunięciu myszki względem ostatniej pozycji w osi X oraz Y.
+  Oprócz tego moduł przekazuje informacje na temat zwrotu myszki w poszczególnych kierunkach oraz informacje na temat wciśniętych przycisków.
+  Oś X, Y oraz status są 8 bitowymi magistralami.
+
+ \item
+  Moduł VGAtxt48x20 - moduł wyświetla przekazane dane na ekranie monitora.
+  Dane podawane są na 8 bitową magistrale.
+  Moduł wyświetla znaki zakodowane według standardowej tablic ASCII, wyjątkiem są wartości z przedziału 0x0 - 0x1F.
+  Informacje na temat wspominanego zakresu można znaleźć w dokumentacji modułu.
+  Po wyświetleniu zadanego znaku, moduł automatycznie zwiększa pozycję na której wystąpi wyświetlenie kolejnego znaku.
+  Możliwy jest również powrót kursora do początku linii lub początku ekranu.
+
+\end{itemize}
 
 \subsection{Osiągnięte cele}
-Wszystkie moduły do zrealizowania kompletnej logiki gry zostały utworzone oraz przetestowane przy użyciu symulatora. Proces generowania bit-streamu oraz syntezy przebiegł pomyślnie. Ze względu na ograniczony dostęp do sprzętu niemożliwe jest przetestowanie układu na sprzęcie.
+Wszystkie moduły do zrealizowania kompletnej logiki gry zostały utworzone oraz przetestowane przy użyciu symulatora.
+Proces generowania bit-streamu oraz syntezy przebiegł pomyślnie.
+Ze względu na ograniczony dostęp do sprzętu niemożliwe jest przetestowanie układu na sprzęcie.
+
 \section{Instrukcja obsługi}
-Po załadowaniu programu na urządzenie, użytkownikowi wyświetlone zostają liczby. Aby zacząć grę, użytkownik powinien kliknąć na najmniejszą z pośród dostępnych. Kliknięcie na inną z nich spowoduje przegraną. Użytkownik używając myszki powinien klikać na wyświetlone kafelki, pod którymi ukryte są liczby. Aby wygrać wszystkie obiekty muszą zostać odkryte w odpowiedniej kolejności.
+Po załadowaniu programu na urządzenie, użytkownikowi wyświetlone zostają liczby.
+Aby zacząć grę, użytkownik powinien kliknąć na najmniejszą z pośród dostępnych.
+Kliknięcie na inną z nich spowoduje przegraną.
+Użytkownik używając myszki powinien klikać na wyświetlone kafelki, pod którymi ukryte są liczby.
+Aby wygrać wszystkie obiekty muszą zostać odkryte w odpowiedniej kolejności.
+
 \section{Podsumowanie}
-Projektowanie aplikacji oraz tworzenie ich w języku VHDL wymaga podejścia innego niż w przypadku programownaia w językach wysokiego poziomu. Należy pamiętać o zależnościach czasowych oraz o tym, że łączenie instrukcji oferowanych przez język VHDL nie odzwierciedla zachowania znanych z innych wysokopoziomowych języków programowania.
+Projektowanie aplikacji oraz tworzenie ich w języku VHDL wymaga podejścia innego niż w przypadku programownaia w językach wysokiego poziomu.
+Należy pamiętać o zależnościach czasowych oraz o tym, że łączenie instrukcji oferowanych przez język VHDL nie odzwierciedla zachowania znanych z innych wysokopoziomowych języków programowania.
+
 \end{document}
