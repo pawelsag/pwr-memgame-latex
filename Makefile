@@ -1,10 +1,17 @@
 # LaTeX Makefile v0.33 -- LaTeX only
 
-PAPER=src/main.tex  # set the path to your TeX file here
-SHELL=/bin/bash # for the while loop below
+PAPER_NAME:=main
+PAPER:=src/$(PAPER_NAME).tex  # set the path to your TeX file here
+SHELL:=/bin/bash # for the while loop below
+OUTDIR:=build
 
 all:  ## Compile paper
-	pdflatex -interaction nonstopmode -halt-on-error -file-line-error --pdf $(PAPER)
+	pdflatex -interaction nonstopmode -halt-on-error -file-line-error -output-directory build --pdf $(PAPER)
 
 watch:  ## Recompile on updates to the source file
 	@while true; do; inotifywait $(PAPER); make all; done
+
+clean:
+	@rm -f build/*
+
+.PHONY: clean
