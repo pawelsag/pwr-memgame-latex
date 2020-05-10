@@ -1,0 +1,112 @@
+\documentclass[polish,polish,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{babel}
+\usepackage{pslatex}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{anysize}
+\usepackage{pgfgantt}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{latexsym,amsmath}
+\marginsize{2.5cm}{2.5cm}{3cm}{3cm}
+
+\newcommand{\name}[1]{\sffamily\bfseries\scriptsize #1}
+\newcommand{\frontpage}[8]{
+%% #1 - nazwa kursu
+%% #2 - kierunek 
+%% #3 - termin 
+%% #4 - temat 
+%% #5 - problem
+%% #6 - skład grupy
+%% #7 - nr grupy
+%% #8 - data
+
+\hfill\includegraphics[width=4cm]{PWr.png}
+\vspace{2cm}
+
+\begin{tabular}{|p{0.72\textwidth}|p{0.28\textwidth}|}
+\hline
+\multicolumn{2}{|c|}{}\\
+\multicolumn{2}{|c|}{{\LARGE #1}}\\
+\multicolumn{2}{|c|}{}\\
+\hline
+\name{Kierunek} & \name{Termin}\\
+\multicolumn{1}{|c|}{\textit{#2}} & \multicolumn{1}{|c|}{\textit{#3}} \\
+\hline
+\name{Temat} & \name{data}\\
+\multicolumn{1}{|c|}{\textit{#4}} & \multicolumn{1}{|c|}{\textit{#5}} \\
+\hline
+\name{Grupa oddająca projekt} & \name{Nr indeksu}\\
+\multicolumn{1}{|c|}{\textit{#6}} & \multicolumn{1}{|c|}{\textit{#7}} \\
+\hline
+\end{tabular}
+}
+
+\usepackage{listings}
+\usepackage{xcolor} % for setting colors
+
+% set the default code style
+\lstset{
+    frame=tb, % draw a frame at the top and bottom of the code block
+    tabsize=4, % tab space width
+    showstringspaces=false, % don't mark spaces in strings
+    numbers=left, % display line numbers on the left
+    commentstyle=\color{green}, % comment color
+    keywordstyle=\color{blue}, % keyword color
+    stringstyle=\color{red} % string color
+}
+
+\title{Sprawozdanie SPD}
+\pgfplotsset{compat=1.16}
+\begin{document}
+% #1 - nazwa kursu #2 - kierunek  #3 - termin #4 - temat #5 - data #6 - skład grupy #7 - nr grupy
+\frontpage{Układy cyfrowe i systemy wbudowane}{Informatyka}{Poniedziałek 11:05}{Gra pamięciowa}{\today}{Paweł Sagan, Patryk Wlazłyń}{241250, 241249}
+\pagestyle{}
+\newpage
+\tableofcontents
+\newpage
+\section{Wstęp}
+Układ FPGA czyli bezpośrednio programowalna macierz bramek logicznych, umożliwia wielokrotne programowanie połączeń cyfrowych układów logicznych. Celem projektu było zaprojektowanie oraz wykonanie programu dedykowanego pod układ FPGA, a następnie jego przetestowanie. Wybrany przez nas temat to gra pamięciowa, w której to użytkownikowi musi zapamiętać losowo umiejscowione liczby, a następnie kliknąć na nie w odpowiedniej kolejności. Projekt dedykowany jest pod urządzenie z układem Xilinx Spartan-3E.
+
+\section{Założenia projektowe}
+Poniżej lista zawierająca przedstawione założenia projektowe:
+\begin{itemize}
+  \item Gra dedykowana jest dla jednego gracza
+  \item Podstawowy interfejsem użytkownika jest mysz podłączona za pomocą złącza ps2
+  \item Aktualny stan gry oraz komunikaty wyświetlane są na ekranie którego rozdzielczość renderowanego obrazu wynosi 48 linii po 20 znaków
+  \item Początkowe umiejscowienie liczb na ekranie, losowane jest przy użyciu algorytmu pseudolosowego LGC.
+  \item Pierwsza poprawną liczbą jest wartość najmniejsza spośród wyświetlonych.
+  \item Ukrycie liczb następuje w momencie kliknięcia na pierwszą z nich.
+  \item Odkrycie liczby większej o dwa lub więcej od poprzednio odkrytej liczby, powoduje zakończenie gry oraz wyświetleniu komunikatu o przegranej użytkownika.
+  \item Użytkownik wygrywa gdy wszystkie liczby zostaną poprawnie odkryte. 
+\end{itemize}
+
+\section{Opis projektu}
+Program składa się z modułów wykonywanych w języku VHDL, które następnie połączone zostały za pomocą głównego schematu projektu. Oprócz modułów wykonanych na potrzebę tego programu, użyte zostały komponenty dostarczone przez dr. Sugiera konkretnie PS2\_MOUSE oraz VGAtxt48x20.Ze względu na ograniczony dostęp do sprzętu, dla każdego komponentu utworzony został test, który potwierdza jego poprawną implementacje. Dodatkowo aby zminimalizować ilość błędów, komponenty zostały pogrupowane w zbiory zawierające najmniejsza możliwą ilość modułów stanowiącą logiczną całość. Dzięki takiemu podejściu analiza błędów syntezy jest mniej złożona. Projekt dedykowany jest pod zestaw Digilent S3E-Starter, który to posiada wyprowadzone złącze PS2 oraz konektor VGA.
+\newline
+Głównym komponentem programu jest moduł logic który spaja ze sobą wszystkie stworzone moduły. W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz relacji pomiędzy nimi. 
+\newpage
+\subsection{Wykorzystane moduły}
+\subsubsection{Stworzone moduły}
+\begin{itemize}
+ \item Licznik - Prosty 16-bitowy moduł zliczający cykle zegara oraz podający informacje o aktualnym stanie licznika na magistrale.
+ \item PS2\_Controler - Moduł służy do wyliczania aktualnej pozycji myszki. Wyliczone dane ograniczone są przez minimalną oraz maksymalną rozdzielczość ekranu. Oznacza to, że moduł nigdy nie zwróci ujemnej pozycji oraz pozycji większej niż założona. Układ propaguje również informacje o kliknięciu przez użytkownika lewego przycisku myszy. Informacja widnieje na linii tak długo, aż inny moduł nie poprosi o jej wyczyszczenie. Wystawione dane pozycji myszki w momencie kliknięcia, pozostają niezmienione, aż do momentu ustawienia linii na stan niski. 
+ \item vga\_driver - Prosty układ potrafiący przekazywać dane od logiki programu na wejście sterownika VGAtxt48x20. Układ posiada 4 tryby. Pierwszy tryb umożliwia renderowanie pamięci bez ukrywania jej zawartości. Oznacza to, że wszystkie wygenerowane liczby renderowane są jako ich odpowiadająca znakowa reprezentacja. Kolejny tryb umożliwia renderowanie ukryte. Oznacza to, że wszystkie liczby w pamięci wyświetlane są jako czarne kafelki. Dwa ostanie tryby umożliwiają wyświetlenie informacji o stanie gry użytkownika. Pierwszy z nich renderuje informacje o przegranej użytkownika, drugi zaś o wygranej. Moduł przyjmuje informacje o pozycji myszki, dzięki czemu jest w stanie wygenerować symbol myszy w odpowiednim miejscu.     
+\end{itemize}
+
+\subsubsection{Zewnętrzne moduły}
+\begin{itemize}
+ \item Moduł PS2\_Mouse - Moduł ten przekazuje dane dostarczone przez aktualnie podłączoną myszkę. Kiedy dane są aktywne układ ustawia jedno cyklowy stan wysoki na linii. Oprócz tego dostarcza informacje o przesunięciu myszki względem ostatniej pozycji w osi X oraz Y. Oprócz tego moduł przekazuje informacje na temat zwrotu myszki w poszczególnych kierunkach oraz informacje na temat wciśniętych przycisków. Oś X, Y oraz status są 8 bitowymi magistralami.
+ \item Moduł VGAtxt48x20 - moduł wyświetla przekazane dane na ekranie monitora. Dane podawane są na 8 bitową magistrale. Moduł wyświetla znaki zakodowane według standardowej tablic ASCII, wyjątkiem są wartości z przedziału 0x0 - 0x1F. Informacje na temat wspominanego zakresu można znaleźć w dokumentacji modułu. Po wyświetleniu zadanego znaku, moduł automatycznie zwiększa pozycję na której wystąpi wyświetlenie kolejnego znaku. Możliwy jest również powrót kursora do początku linii lub początku ekranu.
+ \end{itemize}
+
+\subsection{Osiągnięte cele}
+Wszystkie moduły do zrealizowania kompletnej logiki gry zostały utworzone oraz przetestowane przy użyciu symulatora. Proces generowania bit-streamu oraz syntezy przebiegł pomyślnie. Ze względu na ograniczony dostęp do sprzętu niemożliwe jest przetestowanie układu na sprzęcie.
+\section{Instrukcja obsługi}
+Po załadowaniu programu na urządzenie, użytkownikowi wyświetlone zostają liczby. Aby zacząć grę, użytkownik powinien kliknąć na najmniejszą z pośród dostępnych. Kliknięcie na inną z nich spowoduje przegraną. Użytkownik używając myszki powinien klikać na wyświetlone kafelki, pod którymi ukryte są liczby. Aby wygrać wszystkie obiekty muszą zostać odkryte w odpowiedniej kolejności.
+\section{Podsumowanie}
+Projektowanie aplikacji oraz tworzenie ich w języku VHDL wymaga podejścia innego niż w przypadku programownaia w językach wysokiego poziomu. Należy pamiętać o zależnościach czasowych oraz o tym, że łączenie instrukcji oferowanych przez język VHDL nie odzwierciedla zachowania znanych z innych wysokopoziomowych języków programowania.
+\end{document}
