@@ -12,7 +12,7 @@
 \usepackage{float}
 \usepackage{latexsym,amsmath}
 \marginsize{2.5cm}{2.5cm}{3cm}{3cm}
-
+\usepackage{hyperref}
 \newcommand{\name}[1]{\sffamily\bfseries\scriptsize #1}
 \newcommand{\frontpage}[8]{
 %% #1 - nazwa kursu
@@ -62,6 +62,7 @@
 \title{Sprawozdanie SPD}
 \pgfplotsset{compat=1.16}
 \begin{document}
+\includegraphics[width=6cm]{PWr.png}
 % #1 - nazwa kursu #2 - kierunek  #3 - termin #4 - temat #5 - data #6 - skład grupy #7 - nr grupy
 \frontpage{Układy cyfrowe i systemy wbudowane}{Informatyka}{Poniedziałek 11:05}{Gra pamięciowa}{\today}{Paweł Sagan, Patryk Wlazłyń}{241250, 241249}
 \pagestyle{}
@@ -71,7 +72,7 @@
 \section{Wstęp}
 Celem projektu było zaprojektowanie oraz wykonanie programu dedykowanego pod układ FPGA, a następnie jego przetestowanie na układzie Spartan-3E.
 Wybrany przez nas temat to gra pamięciowa, w której gracz musi zapamiętać umiejscowione liczby na ekranie.
-Gdy gracz naciśnie pierwszą z liczb, reszta zamienia się w niezroróżnialne pola (wypełnione prostokąty).
+Gdy gracz naciśnie pierwszą z liczb, reszta zamienia się w nierozróżnialne pola (wypełnione prostokąty).
 Celem gracza jest zapamiętanie układu liczb, oraz kliknięcie pól w kolejności jaką reprezentowały wcześniej wyświetlone liczby.
 
 \section{Założenia projektowe}
@@ -103,7 +104,7 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
 \begin{itemize}
  \item
   Licznik - Prosty 16-bitowy moduł zliczający cykle zegara oraz podający informacje o aktualnym stanie licznika na magistrale.
-  Użyty jako "seed" dla modułu implementującego generowanie liczb pseudolosowych.
+  Użyty jako 'seed' dla modułu implementującego generowanie liczb pseudolosowych.
 
  \item
   PS2\_Controler - Moduł służy do wyliczania aktualnej pozycji myszki.
@@ -132,15 +133,15 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
 
  \item
   object\_generator - Moduł odpowiedzialny za wygenerowanie kolejnych obiektów wyświetlanych na ekranie w losowych miejscach.
-  Wewnetrzna implementacja korzysta ze zmodyfikowanego algorytmu "Fisher–Yates shuffle".
-  Aby powierdzić równomierny rozkład podczas operacji mieszania, zmodyfikowany algorytm został w pierwszej kolejności zaimplementowany w języku Python.
+  Wewnętrzna implementacja korzysta ze zmodyfikowanego algorytmu "Fisher–Yates shuffle".
+  Aby potwierdzić równomierny rozkład podczas operacji mieszania, zmodyfikowany algorytm został w pierwszej kolejności zaimplementowany w języku Python.
   Modyfikacja polega na poszerzeniu zakresu losowania elementów, które zamieniane są miejscami, na stałą z góry zadaną wartość.
   Pozwala to na całkowite pozbycie się modułu dzielącego.
   Dzielenie przez stałą zostaje wyoptymalizowane jako mnożenie i dodawanie.
-  object\_generator operuje na pamięci ram w celu umiejscowenia liczb w losowo wybranych miejscach.
+  object\_generator operuje na pamięci ram w celu umiejscowienia liczb w losowo wybranych miejscach.
   Parametr wielkości miejsc pustych nie może być zmieniony dynamicznie (w trakcie działania układu), natomiast jest łatwo modyfikowalny w kodzie.
   Wymaga to jednak ponownej syntezy.
-  Parametr ilości generowanych obeiktów zajmujących nie puste pola jest natomiast całkowicie konfigurowalny w czasie działania układu.
+  Parametr ilości generowanych obiektów zajmujących nie puste pola jest natomiast całkowicie konfigurowalny w czasie działania układu.
 
  \item
    ram16 - prosty moduł implementujący pamięć RAM z 16-bitową szyną adresową dla 8-bitowych komórek danych.
@@ -152,7 +153,7 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
   logic - główny moduł spajający i zarządzający.
   Implementuje główną logikę gry, oraz zarządzanie jej stanem.
   Steruje restartowaniem oraz inicjalizacją gry, przełącza moduł vga\_driver w odpowiedni tryb wyświetlania, obsługuje zdarzenia generowane przez moduł 
-  PS2\_Controler, oraz zarządznie dostępem do współdzielonej magistarali do pamięci RAM za pomocą multiplexera memmux.
+  PS2\_Controler, oraz zarządznie dostępem do współdzielonej magistrali do pamięci RAM za pomocą multiplexera memmux.
 
 
 \end{itemize}
@@ -163,7 +164,7 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
   Moduł PS2\_Mouse - Moduł ten przekazuje dane dostarczone przez aktualnie podłączoną myszkę.
   Kiedy dane są aktywne układ ustawia jedno cyklowy stan wysoki na linii.
   Oprócz tego dostarcza informacje o przesunięciu myszki względem ostatniej pozycji w osi X oraz Y.
-  Oprócz tego moduł przekazuje informacje na temat zwrotu myszki w poszczególnych kierunkach oraz informacje na temat wciśniętych przycisków.
+  Moduł przekazuje informacje na temat zwrotu myszki w poszczególnych kierunkach oraz informacje na temat wciśniętych przycisków.
   Oś X, Y oraz status są 8 bitowymi magistralami.
 
  \item
@@ -175,6 +176,64 @@ W poniższej sekcji znajduje się dokładny opis zaprojektowanych modułów oraz
   Możliwy jest również powrót kursora do początku linii lub początku ekranu.
 
 \end{itemize}
+\subsection{Wynik symulacji wybranych modułów }
+\subsubsection{Object generator}
+\includegraphics[width=16cm]{object_generator_tb.png}
+\break
+Object generator odpowiedzialny jest za umieszczenie kolejnych symboli w losowych miejscach na ekranie.
+Aby to osiągnąć wykorzystuje bezpośrednio moduł lcg do generowania liczb losowych, oraz moduł ram16
+do przechowywania informacji na temat generowanych obiektów.
+Ostatecznym wynikiem jest tablica N obiektów (gdzie N zadawane jest jako parametr dynamiczny) ułożonych
+w pamięci w sposób losowy na M pozycjach (gdzie M jest wielkością wyświetlanego obrazu, wyrażoną w obiektach).
+Było to głównym powodem wyboru tego modułu, by na jednym przebiegu czasowym pokazać działanie wszystkich wspomnianych komponentów.
+Po 35ns na wejście i\_object\_count modułu object\_generator przekazywana jest ilość obiektów do wygenerowania.
+W tym przypadku są to 4 obiekty.
+Układ dodatkowo jest resetowany.
+Po wyłączeniu sygnału reset wejście i\_random zaczyna podawać pseudolosowe sekwencję, które przekazywane
+są bezpośrednio z modułu lcg.
+
+Algorytm losowania miejsc dla obiektów działa na podstawie algorytmu "Fisher–Yates shuffle".
+Na początku, od 65ns do 105ns, w stanie "0" następuje zapisanie obiektów w kolejnych komórkach pamięci.
+W tym przypadku są to obiekty pod adresami od 0 do 3. Wpisane wartości to odpowiednio
+kody liter ASCII kolejnych cyfr.
+
+Następnie moduł, w stanie "10" rozpoczyna iterowanie po całej, tak wygenerowanej tablicy, oraz
+zamianie zawartości z losowymi komórkami pamięci.
+Procedura swap(*addr1, *addr2) osiągana jest poprzez dwa odczyty oraz dwa zapisy pod zamienione adresy.
+Taką pojedynczą wymianę, można zaobserwować na osi w od czasu 115ns do 155ns.
+Najpierw odczytywana (o\_mem\_we = 0) jest wartość spod adresu 0x0001.
+W następnym cyklu odczytana zostaje wartość 0x49.
+Następnie następuje odczyt z losowego adresu, w tym przypadku 0x0063.
+Zaraz po nim widać dwa zapisy do pamięci (o\_mem\_we = 1) pod adresy 0x0063 oraz 0x0001.
+Jedyna różnica jest teraz taka, że wcześniej odczytane wartości są teraz wpisane w odwrotnej kolejności
+tj. *0x0063 = 0x49, *0x0001 = 0x00.
+Taka procedura powtarzana jest N razy.
+Po niej ustawiane jest wyjście o\_ready = 1, które oznacza, że moduł zakończył generowanie obiektów
+i logika może przejść do kolejnej fazy. Wyjście ze stanu o\_ready = 1 możliwe jest poprzez ponowne ustawienie
+sygnału i\_reset = 1.
+
+W powyższym przykładzie został pominięty wykres zerowania całej pamięci, które ma miejsce zaraz przed
+rozpoczęciem generowania nowych elementów, dla zachowania większej czytelności.
+Zerowanie jest wymagane, aby można było w dowolnym momencie zresetować cały stan gry i rozpocząć na nowo,
+np. w przypadku przegranej.
+\subsubsection{PS2 Controller}
+\includegraphics[width=16cm]{ps2_tb.png}
+\break
+Moduł PS2 Controller wykorzystuje komponent PS2 udostępniony w ramach kursu układów 
+Cyfrowych i systemów wbudowanych do odczytywania przesunięcia myszki
+oraz status przycisków. 
+Moduł wylicza pozycję kursora dbając o to aby nie przekroczył on założonych granic. 
+Pozycja kursora nie może znaleźć się poza ekranem, stąd jego najmniejsza wartość jest 0.
+W zależności od wartości magistrali 'Status' która niesie informacje o kierunku ruchu myszki,
+wartości w osi X są odejmowane gdy Status(5) = 1 oraz dodawane gdy Status(5) = 0.
+Analogicznie odbywa się to dla osi Y.
+Przygotowany testbench w nieskończonej pętli odejmuje oraz dodaje na zmianę zmieniające się wartości z tablicy.
+Takie zachowanie wymuszone jest negującą się wartością wszystkich bitów na magistrali 'Status', które niesie informacje o kierunku
+ruchu myszki.
+Są to kolejno [0x1, 0x2, 0x3, 0x4]. Testbench pokazuje, że wynik odjęcia pierwszej wartości od zera ulega saturacji
+nie przekraczając z góry założonych ograniczeń.
+Następnie dodajemy 2, odejmujemy 3, dodajemy 4, po czym znów odejmujemy 1.
+Pozycja myszki przechowywana jest na dwóch magistralach "x\_cur\_pos" oraz "y\_cur\_pos".
 
 \subsection{Osiągnięte cele}
 Wszystkie moduły do zrealizowania kompletnej logiki gry zostały utworzone oraz przetestowane przy użyciu symulatora.
@@ -182,15 +241,17 @@ Proces generowania bit-streamu oraz syntezy przebiegł pomyślnie.
 Ze względu na ograniczony dostęp do sprzętu niemożliwe jest przetestowanie układu na sprzęcie.
 
 \section{Instrukcja obsługi}
-Po załadowaniu programu na urządzenie, gracz rozpoczyna nową grę przez kliknięcie w dowlnym miejscu na ekranie.
+Po załadowaniu programu na urządzenie, gracz rozpoczyna nową grę przez kliknięcie w dowolnym miejscu na ekranie.
 Następnie stan nowej gry zostaje zainicjalizowany w pamięci, oraz zostają wylosowane miejsca na kolejne liczby.
 Liczby zostają ukazane na ekranie, a zadaniem gracza jest kliknięci ich w kolejności reprezentowanej przez wartości liczb.
-Kliknięcie chociaż jedej z nich w złej kolejności spowoduje przegraną (aby aby rozpocząć na nowo, należy kliknąć w dowolne miejsce na ekranie).
+Kliknięcie chociaż jednej z nich w złej kolejności spowoduje przegraną (aby rozpocząć na nowo, należy kliknąć w dowolne miejsce na ekranie).
 Aby wygrać wszystkie obiekty muszą zostać odkryte.
 
 \section{Podsumowanie}
-Projektowanie aplikacji oraz tworzenie ich w języku VHDL wymaga podejścia innego niż w przypadku programownaia w językach wysokiego poziomu, które
+Projektowanie aplikacji oraz tworzenie ich w języku VHDL wymaga podejścia innego niż w przypadku programowania w językach wysokiego poziomu, które
 wykonywane są przez procesory ogólnego przeznaczenia.
 Należy pamiętać o zależnościach czasowych oraz o tym, że łączenie instrukcji oferowanych przez język VHDL nie odzwierciedla zachowania znanych z innych wysokopoziomowych języków programowania, jak np. to, że rezultaty niektórych przypisań widoczne są dopiero z następnym cyklem zegara.
-
+\newline
+Kod projektu zamieszczony jest w serwisie github dostepny po kliknięciu na wyróżniony tekst:
+\textcolor{blue}{\href{https://github.com/3919/pwr-memgame}{Pwr-memgame}}
 \end{document}
