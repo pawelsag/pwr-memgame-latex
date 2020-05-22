@@ -195,14 +195,14 @@ Po wyłączeniu sygnału reset wejście i\_random zaczyna podawać pseudolosowe 
 są bezpośrednio z modułu lcg.
 
 Algorytm losowania miejsc dla obiektów działa na podstawie algorytmu "Fisher–Yates shuffle".
-Na początku, od 65ns do 105ns, w stanie "0" następuje zapisanie obiektów w kolejnych komórkach pamięci.
+Na początku, w przedziale czasu od 65ns do 105ns, w stanie '0' następuje zapisanie obiektów w kolejnych komórkach pamięci.
 W tym przypadku są to obiekty pod adresami od 0 do 3. Wpisane wartości to odpowiednio
 kody liter ASCII kolejnych cyfr.
 
-Następnie moduł, w stanie "10" rozpoczyna iterowanie po całej, tak wygenerowanej tablicy, oraz
-zamianie zawartości z losowymi komórkami pamięci.
-Procedura swap(*addr1, *addr2) osiągana jest poprzez dwa odczyty oraz dwa zapisy pod zamienione adresy.
-Taką pojedynczą wymianę, można zaobserwować na osi w od czasu 115ns do 155ns.
+Następnie moduł, w stanie '10' rozpoczyna iterowanie po całej, tak wygenerowanej tablicy, oraz
+zamienia zawartości z losowymi komórkami pamięci.
+Procedura swap(*addr1, *addr2) osiągana jest poprzez dwa odczyty oraz dwa zapisy pod wskazane adresy.
+Taką pojedynczą wymianę, można zaobserwować w przedziale czasu od 115ns do 155ns.
 Najpierw odczytywana (o\_mem\_we = 0) jest wartość spod adresu 0x0001.
 W następnym cyklu odczytana zostaje wartość 0x49.
 Następnie następuje odczyt z losowego adresu, w tym przypadku 0x0063.
@@ -227,15 +227,15 @@ oraz status przycisków.
 Moduł wylicza pozycję kursora dbając o to aby nie przekroczył on założonych granic. 
 Pozycja kursora nie może znaleźć się poza ekranem, stąd jego najmniejsza wartość jest 0.
 W zależności od wartości magistrali 'Status' która niesie informacje o kierunku ruchu myszki,
-wartości w osi X są odejmowane gdy Status(5) = 1 oraz dodawane gdy Status(5) = 0.
-Analogicznie odbywa się to dla osi Y.
+wartości w osi X są odejmowane gdy Status(4) = 1 oraz dodawane gdy Status(4) = 0.
+Analogicznie odbywa się to dla osi Y. Z tym że,tym razem o zwrocie kierunku ruchu w tej osi decyduje wartość bitu Status(5).
 Przygotowany testbench w nieskończonej pętli odejmuje oraz dodaje na zmianę zmieniające się wartości z tablicy.
-Takie zachowanie wymuszone jest negującą się wartością wszystkich bitów na magistrali 'Status', które niesie informacje o kierunku
+Takie zachowanie wymuszone jest negującą się wartością wszystkich bitów na magistrali 'Status', która niesie informacje o kierunku
 ruchu myszki.
 Są to kolejno [0x1, 0x2, 0x3, 0x4]. Testbench pokazuje, że wynik odjęcia pierwszej wartości od zera ulega saturacji
 nie przekraczając z góry założonych ograniczeń.
 Następnie dodajemy 2, odejmujemy 3, dodajemy 4, po czym znów odejmujemy 1.
-Pozycja myszki przechowywana jest na dwóch magistralach "x\_cur\_pos" oraz "y\_cur\_pos".
+Pozycja myszki przechowywana jest na dwóch magistralach 'x\_cur\_pos' oraz 'y\_cur\_pos'.
 
 \subsection{Osiągnięte cele}
 Wszystkie moduły do zrealizowania kompletnej logiki gry zostały utworzone oraz przetestowane przy użyciu symulatora.
